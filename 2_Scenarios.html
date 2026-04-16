@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Scenarios - Recovery Playbook | Kaseya University</title>
+    <style>
+        /* ── Reset & Base ─────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --ku-blue:      #005696;
+            --ku-dark:      #0a2540;
+            --ku-accent:    #00a3e0;
+            --case1-color:  #C67A70;
+            --case1-light:  #FCF5F3;
+            --case1-text:   #FFF8F6;
+            --case2-color:  #4A7C59;
+            --case2-light:  #f0f7f2;
+            --case2-text:   #D1E8D5;
+            --case3-color:  #1d6fa4;
+            --case3-light:  #eff7fd;
+            --case3-text:   #bde3f7;
+            --case4-color:  #8D78B1;
+            --case4-light:  #F7F4FB;
+            --case4-text:   #F8F5FC;
+            --sidebar-w:    280px;
+            --font:         "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html {
+            background: transparent;
+        }
+
+        body {
+            font-family: var(--font);
+            background: transparent;
+            color: var(--ku-dark);
+            display: flex;
+            flex-direction: row;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Sidebar ──────────────────────────────────────────── */
+        aside {
+            width: var(--sidebar-w);
+            background: rgba(255,255,255,0.96);
+            border-right: 1px solid #e2e8f0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 40;
+            overflow: hidden;
+        }
+        .sidebar-header {
+            padding: 1.75rem 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            background: rgba(248,250,252,0.92);
+            text-align: center;
+        }
+        .sidebar-header h1 {
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: var(--ku-dark);
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+        .sidebar-header p {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.25rem;
+        }
+
+        nav { flex: 1; overflow-y: auto; padding: 1rem 0.5rem; }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .icon-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            min-width: 1.25rem;
+            font-size: 0.95rem;
+            line-height: 1;
+        }
+
+        .nav-section-label {
+            font-size: 0.55rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #94a3b8;
+            padding: 0.75rem 1.25rem 0.35rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.65rem 1.25rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #475569;
+            border-radius: 0.5rem;
+            margin-bottom: 0.15rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: left;
+            font-family: inherit;
+        }
+        .nav-link:hover { background: #f8fafc; color: var(--ku-blue); }
+        .nav-link:focus-visible,
+        .index-card:focus-visible,
+        .menu-btn:focus-visible {
+            outline: 3px solid #93c5fd;
+            outline-offset: 2px;
+        }
+        .nav-link.active {
+            border-left: 3px solid var(--ku-blue);
+            background: #f0f7ff;
+            color: var(--ku-blue);
+            font-weight: 700;
+        }
+        .nav-divider { border: none; border-top: 1px solid #f1f5f9; margin: 0.75rem 0.5rem; }
+
+        .sidebar-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #f1f5f9;
+            background: rgba(248,250,252,0.92);
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-align: center;
+        }
+
+        /* ── Main Content ─────────────────────────────────────── */
+        main {
+            flex: 1;
+            padding: 3rem 3.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+            overflow-y: auto;
+            width: 100%;
+            min-width: 0;
+        }
+        .page-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .page-action-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1rem;
+            border-radius: 999px;
+            border: 1px solid #dbe3eb;
+            background: #fff;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 700;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .page-action-link:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: var(--ku-blue);
+        }
+        .page-action-link.primary {
+            background: var(--ku-blue);
+            border-color: var(--ku-blue);
+            color: #fff;
+        }
+        .page-action-link.primary:hover {
+            background: var(--ku-dark);
+            border-color: var(--ku-dark);
+            color: #fff;
+        }
+
+        /* ── Page Sections ────────────────────────────────────── */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ── Page Header ──────────────────────────────────────── */
+        .page-header {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 2rem;
+            margin-bottom: 3rem;
+        }
+        .page-header .label {
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--ku-accent);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .page-header h2 {
+            font-size: 2.25rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            color: #0f172a;
+            text-transform: uppercase;
+        }
+        .page-header p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+
+        /* ── Index Grid ───────────────────────────────────────── */
+        .index-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        .index-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.875rem;
+            padding: 1.25rem 1.5rem;
+            cursor: pointer;
+            transition: box-shadow 0.15s, border-color 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+        }
+        .index-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-color: #cbd5e1;
+        }
+        .index-card .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .index-card h3 {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+        }
+        .index-card p {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 0.15rem;
+        }
+
+        /* ── Case Card ────────────────────────────────────────── */
+        .case-card {
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            margin-bottom: 1.75rem;
+        }
+        .case-icon {
+            width: 3.25rem; height: 3.25rem;
+            border-radius: 0.875rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .case-number {
+            font-size: 0.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+        .case-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        /* Flashcards row */
+        .flashcard-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.75rem;
+        }
+        .flashcard {
+            border-radius: 0.75rem;
+            padding: 1rem 1.125rem;
+        }
+        .flashcard .fc-label {
+            font-size: 0.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.35rem;
+            display: block;
+        }
+        .flashcard p {
+            font-size: 0.8rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* Scenario narrative */
+        .narrative {
+            background: rgba(255,255,255,0.65);
+            border-radius: 1rem;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            color: #1e293b;
+        }
+        .narrative strong {
+            font-weight: 800;
+            display: block;
+            margin-bottom: 0.75rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Requirements list */
+        .req-list {
+            list-style: none;
+            margin-top: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .req-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.78rem;
+        }
+        .req-list li::before {
+            content: "›";
+            font-weight: 900;
+            flex-shrink: 0;
+            margin-top: 0.05rem;
+        }
+
+        /* Discussion Questions */
+        .discussion-block {
+            border-radius: 1rem;
+            padding: 1.5rem 1.75rem;
+        }
+        .discussion-block .dq-label {
+            font-size: 0.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+        .dq-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .dq-list li {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.78rem;
+            line-height: 1.55;
+        }
+        .dq-num {
+            width: 1.5rem; height: 1.5rem;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 900;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        /* RPO/RTO badge */
+        .rto-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 2rem;
+            padding: 0.35rem 0.875rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Mobile header */
+        .mobile-header {
+            display: none;
+            background: rgba(255,255,255,0.98);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 1.25rem;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .mobile-header span {
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: var(--ku-dark);
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+        }
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: var(--ku-dark);
+        }
+
+        @media (max-width: 1024px) {
+            main { padding: 2rem 1.75rem; }
+            .page-header h2 { font-size: 1.95rem; }
+            .case-card { padding: 2rem; }
+            .flashcard-row { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            aside {
+                position: fixed; left: 0; top: 0;
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+                width: min(86vw, 22rem);
+                height: 100vh;
+                z-index: 60;
+                box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+            }
+            aside.open { transform: translateX(0); }
+            .mobile-header { display: flex; }
+            main { padding: 1.5rem 1.25rem; max-width: none; }
+            .page-actions { justify-content: stretch; }
+            .page-action-link { width: 100%; justify-content: center; }
+            .index-grid { grid-template-columns: 1fr; }
+            .flashcard-row { grid-template-columns: 1fr; }
+            .page-header { padding-bottom: 1.5rem; margin-bottom: 2rem; }
+            .page-header h2 { font-size: 1.7rem; }
+            .case-card { padding: 1.25rem; }
+            .case-header { align-items: flex-start; gap: 1rem; }
+            .case-title { font-size: 1.2rem; }
+            .narrative, .discussion-block { padding: 1.1rem 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .mobile-header { padding: 0.9rem 1rem; }
+            main { padding: 1.25rem 0.9rem; }
+            .index-card { padding: 1rem; align-items: flex-start; }
+            .case-icon { width: 2.75rem; height: 2.75rem; font-size: 1.25rem; }
+            .dq-list li { gap: 0.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Mobile Header -->
+<div class="mobile-header">
+    <span>Case Scenarios</span>
+    <button class="menu-btn" type="button" aria-label="Open case navigation" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <span aria-hidden="true">☰</span>
+    </button>
+</div>
+
+<!-- ── Sidebar ──────────────────────────────────────────────────── -->
+<aside id="sidebar">
+    <div class="sidebar-header">
+        <h1>Kaseya University</h1>
+        <p>Recovery Playbook Lab &bull; LV 2026</p>
+    </div>
+
+    <nav>
+        <span class="nav-section-label">Case Scenarios</span>
+        <button type="button" class="nav-link active" id="link-overview" onclick="showPage('overview',this)">
+            <span class="icon-badge" aria-hidden="true" style="color:#005696;">▦</span> Overview
+        </button>
+        <button type="button" class="nav-link" id="link-case1" onclick="showPage('case1',this)">
+            <span class="icon-badge" aria-hidden="true" style="color:#B9392F;">✦</span> Hands of Time
+        </button>
+        <button type="button" class="nav-link" id="link-case2" onclick="showPage('case2',this)">
+            <span class="icon-badge" aria-hidden="true" style="color:#4A7C59;">✂</span> Visual Barbering
+        </button>
+        <button type="button" class="nav-link" id="link-case3" onclick="showPage('case3',this)">
+            <span class="icon-badge" aria-hidden="true" style="color:#1d6fa4;">☼</span> Hidden Tiki Paradise
+        </button>
+        <button type="button" class="nav-link" id="link-case4" onclick="showPage('case4',this)">
+            <span class="icon-badge" aria-hidden="true" style="color:#7c3aed;">◆</span> Marie's Wonderland
+        </button>
+    </nav>
+
+    <div class="sidebar-footer">Las Vegas Conference 2026</div>
+</aside>
+
+<!-- ── Main Content ──────────────────────────────────────────────── -->
+<main>
+    <div class="page-actions">
+        <a href="1_Main_content.html" class="page-action-link">Home</a>
+        <a href="3_DR_scenarios.html" class="page-action-link primary">Continue to DR Scenarios</a>
+    </div>
+
+<!-- ============================================================ -->
+<!-- PAGE: OVERVIEW -->
+<!-- ============================================================ -->
+<div id="page-overview" class="page active">
+    <div class="page-header">
+        <span class="label">Hands-On Activity</span>
+        <h2>Meeting Client Needs</h2>
+        <p>Four real-world client profiles. Identify the right Kaseya solution stack, justify your recommendation, and present in 3 minutes or less.</p>
+    </div>
+
+    <div class="index-grid">
+        <button type="button" class="index-card" onclick="showPage('case1', document.getElementById('link-case1'))">
+            <div class="dot" style="background:#B9392F;"></div>
+            <div>
+                <h3>Case 1 — Hands of Time</h3>
+                <p>Watch manufacturer · Oklahoma City, OK · Tornado risk</p>
+            </div>
+        </button>
+        <button type="button" class="index-card" onclick="showPage('case2', document.getElementById('link-case2'))">
+            <div class="dot" style="background:#4A7C59;"></div>
+            <div>
+                <h3>Case 2 — Visual Barbering Studios</h3>
+                <p>Barber shop & bar · Rural Pennsylvania · Poor connectivity</p>
+            </div>
+        </button>
+        <button type="button" class="index-card" onclick="showPage('case3', document.getElementById('link-case3'))">
+            <div class="dot" style="background:#1d6fa4;"></div>
+            <div>
+                <h3>Case 3 — Hidden Tiki Paradise</h3>
+                <p>Restaurant · San Juan, PR · Hyper-V environment</p>
+            </div>
+        </button>
+        <button type="button" class="index-card" onclick="showPage('case4', document.getElementById('link-case4'))">
+            <div class="dot" style="background:#7c3aed;"></div>
+            <div>
+                <h3>Case 4 — Marie's Wonderland</h3>
+                <p>Bakery · Fayetteville, NC · Two locations + mobile trucks</p>
+            </div>
+        </button>
+    </div>
+
+    <!-- Exercise Framework -->
+    <div style="background:#0f172a;border-radius:1.25rem;padding:2rem 2.25rem;color:#fff;">
+        <div style="font-size:0.65rem;font-weight:900;text-transform:uppercase;letter-spacing:0.12em;color:#00a3e0;margin-bottom:1rem;">Exercise Framework</div>
+        <ol style="list-style:none;display:flex;flex-direction:column;gap:0.875rem;">
+            <li style="display:flex;gap:1rem;font-size:0.8rem;line-height:1.55;">
+                <span style="width:1.5rem;height:1.5rem;border-radius:50%;background:#005696;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;flex-shrink:0;">1</span>
+                <span>Review the client profile — industry, size, compliance needs, budget, and connectivity.</span>
+            </li>
+            <li style="display:flex;gap:1rem;font-size:0.8rem;line-height:1.55;">
+                <span style="width:1.5rem;height:1.5rem;border-radius:50%;background:#005696;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;flex-shrink:0;">2</span>
+                <span>Identify the implicit RPO and RTO based on the client's business description.</span>
+            </li>
+            <li style="display:flex;gap:1rem;font-size:0.8rem;line-height:1.55;">
+                <span style="width:1.5rem;height:1.5rem;border-radius:50%;background:#005696;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;flex-shrink:0;">3</span>
+                <span>Select the right solution(s): Datto BCDR, Unitrends, SaaS Protection, Endpoint Backup, or a combination.</span>
+            </li>
+            <li style="display:flex;gap:1rem;font-size:0.8rem;line-height:1.55;">
+                <span style="width:1.5rem;height:1.5rem;border-radius:50%;background:#005696;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;flex-shrink:0;">4</span>
+                <span>Justify your recommendation with specific feature references from today's content.</span>
+            </li>
+            <li style="display:flex;gap:1rem;font-size:0.8rem;line-height:1.55;">
+                <span style="width:1.5rem;height:1.5rem;border-radius:50%;background:#005696;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;flex-shrink:0;">5</span>
+                <span>Present your recommendation to the group in <strong>3 minutes or less</strong>.</span>
+            </li>
+        </ol>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CASE 1: HANDS OF TIME -->
+<!-- ============================================================ -->
+<div id="page-case1" class="page">
+    <div class="case-card" style="background:var(--case1-light);border:1.5px solid rgba(198,122,112,0.16);">
+
+        <div class="case-header">
+            <div class="case-icon" style="background:rgba(198,122,112,0.14);">
+                <span class="icon-badge" aria-hidden="true" style="color:var(--case1-color);font-size:1.4rem;">✦</span>
+            </div>
+            <div>
+                <div class="case-number" style="color:var(--case1-color);">Case Scenario 1</div>
+                <div class="case-title">Hands of Time vs. The Tornado</div>
+            </div>
+        </div>
+
+        <div class="flashcard-row">
+            <div class="flashcard" style="background:var(--case1-color);">
+                <span class="fc-label" style="color:var(--case1-text);">Company</span>
+                <p style="color:var(--case1-text);">Hands of Time Watch Manufacturer</p>
+            </div>
+            <div class="flashcard" style="background:var(--case1-color);">
+                <span class="fc-label" style="color:var(--case1-text);">Location</span>
+                <p style="color:var(--case1-text);">Oklahoma City, OK — tornado risk area</p>
+            </div>
+            <div class="flashcard" style="background:var(--case1-color);">
+                <span class="fc-label" style="color:var(--case1-text);">Workforce</span>
+                <p style="color:var(--case1-text);">70 employees — 50 on-site / 20 remote (US)</p>
+            </div>
+        </div>
+
+        <div class="rto-badge" style="color:var(--case1-color);">
+            <span aria-hidden="true">◔</span> RPO: 1 hour &nbsp;|&nbsp; RTO: 4 hours
+        </div>
+
+        <div class="narrative">
+            <strong>Client Profile</strong>
+            <p>Watch manufacturer located in Oklahoma City, where tornadoes are known to occur without warning. They need comprehensive protection across on-site servers, virtual machines, remote endpoints, and their Microsoft 365 environment.</p>
+
+            <p style="margin-top:1rem;font-weight:700;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#475569;">Protection Requirements</p>
+            <ul class="req-list" style="margin-top:0.5rem;">
+                <li>Microsoft 365 — automated backups with granular restore support</li>
+                <li><strong>Server 1 (Physical):</strong> 6TB — ERP &amp; Accounting. Backups 5am–11pm daily; cloud replication every 4 hours</li>
+                <li><strong>Server 2 (Physical):</strong> VMware host housing 10 VMs — image-based backup required</li>
+                <li><strong>10 VM Workstations/Desktops:</strong> Hourly backups M–F 5am–7pm; offsite replication at 5am, 12pm &amp; 7pm; application &amp; service verification + screenshot enabled</li>
+                <li><strong>20 Remote Endpoints:</strong> Sales team traveling nationwide — laptop data must be protected and BMR-ready</li>
+                <li>Local restore capability required if the appliance is still functional after a disaster</li>
+            </ul>
+        </div>
+
+        <div class="discussion-block" style="background:var(--case1-color);">
+            <span class="dq-label" style="color:var(--case1-text);">Discussion Questions</span>
+            <ol class="dq-list">
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">1</span>
+                    <span style="color:rgba(255,255,255,0.9);">Which Datto BCDR recovery topology do you activate first if a tornado destroys the server room, and why?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">2</span>
+                    <span style="color:rgba(255,255,255,0.9);">How do you design the backup schedule for the VMware environment to meet the 1-hour RPO for the 10 VMs?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">3</span>
+                    <span style="color:rgba(255,255,255,0.9);">What product protects the 20 remote sales endpoints, and what restore type gets a lost or destroyed laptop back to full operation?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">4</span>
+                    <span style="color:rgba(255,255,255,0.9);">What is your communication plan to the business owner regarding the RTO commitment?</span>
+                </li>
+            </ol>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CASE 2: VISUAL BARBERING STUDIOS -->
+<!-- ============================================================ -->
+<div id="page-case2" class="page">
+    <div class="case-card" style="background:var(--case2-light);border:1.5px solid rgba(74,124,89,0.15);">
+
+        <div class="case-header">
+            <div class="case-icon" style="background:rgba(74,124,89,0.15);">
+                <span class="icon-badge" aria-hidden="true" style="color:var(--case2-color);font-size:1.4rem;">✂</span>
+            </div>
+            <div>
+                <div class="case-number" style="color:var(--case2-color);">Case Scenario 2</div>
+                <div class="case-title">Visual Barbering Studios</div>
+            </div>
+        </div>
+
+        <div class="flashcard-row">
+            <div class="flashcard" style="background:var(--case2-color);">
+                <span class="fc-label" style="color:var(--case2-text);">Company</span>
+                <p style="color:var(--case2-text);">Barber Shop &amp; Full-Service Bar</p>
+            </div>
+            <div class="flashcard" style="background:var(--case2-color);">
+                <span class="fc-label" style="color:var(--case2-text);">Location</span>
+                <p style="color:var(--case2-text);">Rural Pennsylvania — poor network speeds</p>
+            </div>
+            <div class="flashcard" style="background:var(--case2-color);">
+                <span class="fc-label" style="color:var(--case2-text);">Workforce</span>
+                <p style="color:var(--case2-text);">10 employees — no remote workers; owner has travel laptops</p>
+            </div>
+        </div>
+
+        <div class="rto-badge" style="color:var(--case2-color);">
+            <span aria-hidden="true">◔</span> RPO: 4 hours &nbsp;|&nbsp; RTO: 6 hours
+        </div>
+
+        <div class="narrative">
+            <strong>Client Profile</strong>
+            <p>A barber shop and bar combo in rural Pennsylvania where network speeds are unreliable. Cloud offsite replication is not feasible. Owner uses laptops for travel and potential expansion planning.</p>
+
+            <p style="margin-top:1rem;font-weight:700;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#475569;">Protection Requirements</p>
+            <ul class="req-list" style="margin-top:0.5rem;">
+                <li>Google Workspace — mail and document restore coverage required</li>
+                <li><strong>1 Physical Server:</strong> SQL + MySQL, 7TB — full model recovery. Full backup once per week; incremental backups remaining days. Image + database backup required</li>
+                <li><strong>3 Workstations:</strong> Backup during office hours 8am–6pm, seven days a week — data and image protection</li>
+                <li><strong>Secondary copy:</strong> Replicate to a local NAS only — no cloud replication due to network latency</li>
+                <li><strong>Owner laptops:</strong> Need cloud-capable backup regardless of location — endpoint protection required</li>
+                <li>Local restore required if appliance is still functional</li>
+            </ul>
+        </div>
+
+        <div class="discussion-block" style="background:var(--case2-color);">
+            <span class="dq-label" style="color:var(--case2-text);">Discussion Questions</span>
+            <ol class="dq-list">
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">1</span>
+                    <span style="color:rgba(255,255,255,0.9);">Which backup appliance do you recommend, and why is a local NAS the right secondary copy strategy given the network constraints?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">2</span>
+                    <span style="color:rgba(255,255,255,0.9);">Which systems require backup agents, and what specific protection does each agent provide?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">3</span>
+                    <span style="color:rgba(255,255,255,0.9);">What backup schedule would you configure for the three workstations to meet business hours and the 4-hour RPO?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">4</span>
+                    <span style="color:rgba(255,255,255,0.9);">What backup type and data reduction technology protects the SQL/MySQL server on 7TB of storage?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">5</span>
+                    <span style="color:rgba(255,255,255,0.9);">How do you configure the secondary copy job to the NAS, and why is a cold copy the right method here?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">6</span>
+                    <span style="color:rgba(255,255,255,0.9);">How do you protect the owner's travel laptops given poor on-site connectivity and no on-site infrastructure?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">7</span>
+                    <span style="color:rgba(255,255,255,0.9);">What solution protects the Google Workspace data, and what risks does it address that the appliance backup cannot?</span>
+                </li>
+            </ol>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CASE 3: HIDDEN TIKI PARADISE -->
+<!-- ============================================================ -->
+<div id="page-case3" class="page">
+    <div class="case-card" style="background:var(--case3-light);border:1.5px solid rgba(29,111,164,0.15);">
+
+        <div class="case-header">
+            <div class="case-icon" style="background:rgba(29,111,164,0.15);">
+                <span class="icon-badge" aria-hidden="true" style="color:var(--case3-color);font-size:1.4rem;">☼</span>
+            </div>
+            <div>
+                <div class="case-number" style="color:var(--case3-color);">Case Scenario 3</div>
+                <div class="case-title">Hidden Tiki Paradise</div>
+            </div>
+        </div>
+
+        <div class="flashcard-row">
+            <div class="flashcard" style="background:var(--case3-color);">
+                <span class="fc-label" style="color:var(--case3-text);">Company</span>
+                <p style="color:var(--case3-text);">Family-run restaurant — major tourist destination</p>
+            </div>
+            <div class="flashcard" style="background:var(--case3-color);">
+                <span class="fc-label" style="color:var(--case3-text);">Location</span>
+                <p style="color:var(--case3-text);">San Juan, Puerto Rico</p>
+            </div>
+            <div class="flashcard" style="background:var(--case3-color);">
+                <span class="fc-label" style="color:var(--case3-text);">Workforce</span>
+                <p style="color:var(--case3-text);">5 family employees — no remote workers; owner travels</p>
+            </div>
+        </div>
+
+        <div class="rto-badge" style="color:var(--case3-color);">
+            <span aria-hidden="true">◔</span> RPO: 2 hours &nbsp;|&nbsp; RTO: 4 hours
+        </div>
+
+        <div class="narrative">
+            <strong>Client Profile</strong>
+            <p>A tropical restaurant and major tourist attraction in San Juan, PR. Family-run with a Hyper-V virtualization environment hosting business-critical applications. Owner uses a laptop for travel and sales outreach.</p>
+
+            <p style="margin-top:1rem;font-weight:700;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#475569;">Protection Requirements</p>
+            <ul class="req-list" style="margin-top:0.5rem;">
+                <li>Microsoft 365 — top priority: full tenant coverage for mailboxes, SharePoint, and Teams</li>
+                <li><strong>Hyper-V Environment:</strong>
+                    <ul style="margin-left:1.5rem;margin-top:0.35rem;display:flex;flex-direction:column;gap:0.25rem;">
+                        <li style="font-size:0.78rem;">1 Physical host machine housing 2 VMs</li>
+                        <li style="font-size:0.78rem;">VM 1: Virtual Terminal for POS transactions &amp; table management history</li>
+                        <li style="font-size:0.78rem;">VM 2: Administration — safety, compliance, and HR data</li>
+                    </ul>
+                </li>
+                <li>VM backups — local + cloud replication every hour from 7am–11pm, seven days a week</li>
+                <li><strong>Owner laptop:</strong> Full protection — Endpoint Backup required</li>
+                <li>Local restore required if appliance is still functional</li>
+            </ul>
+        </div>
+
+        <div class="discussion-block" style="background:var(--case3-color);">
+            <span class="dq-label" style="color:var(--case3-text);">Discussion Questions</span>
+            <ol class="dq-list">
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">1</span>
+                    <span style="color:rgba(255,255,255,0.9);">How do you configure the Datto agent on the Hyper-V host to avoid duplicate backups of the VMs and the host's data volume?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">2</span>
+                    <span style="color:rgba(255,255,255,0.9);">What replication schedule do you configure to meet the 2-hour RPO during peak operating hours (7am–11pm)?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">3</span>
+                    <span style="color:rgba(255,255,255,0.9);">If the physical Hyper-V host fails during a dinner rush, which recovery topology do you activate first and why?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">4</span>
+                    <span style="color:rgba(255,255,255,0.9);">What solution and coverage scope do you propose for the Microsoft 365 environment?</span>
+                </li>
+            </ol>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CASE 4: MARIE'S WONDERLAND OF SWEETS -->
+<!-- ============================================================ -->
+<div id="page-case4" class="page">
+    <div class="case-card" style="background:var(--case4-light);border:1.5px solid rgba(141,120,177,0.18);">
+
+        <div class="case-header">
+            <div class="case-icon" style="background:rgba(141,120,177,0.16);">
+                <span class="icon-badge" aria-hidden="true" style="color:var(--case4-color);font-size:1.4rem;">◆</span>
+            </div>
+            <div>
+                <div class="case-number" style="color:var(--case4-color);">Case Scenario 4</div>
+                <div class="case-title">Marie's Wonderland of Sweets</div>
+            </div>
+        </div>
+
+        <div class="flashcard-row">
+            <div class="flashcard" style="background:var(--case4-color);">
+                <span class="fc-label" style="color:var(--case4-text);">Company</span>
+                <p style="color:var(--case4-text);">Bakery — two shop locations + mobile trucks</p>
+            </div>
+            <div class="flashcard" style="background:var(--case4-color);">
+                <span class="fc-label" style="color:var(--case4-text);">Location</span>
+                <p style="color:var(--case4-text);">Fayetteville, NC — multiple sites</p>
+            </div>
+            <div class="flashcard" style="background:var(--case4-color);">
+                <span class="fc-label" style="color:var(--case4-text);">Environment</span>
+                <p style="color:var(--case4-text);">2 shops (3 servers each) + 2 Mac-based bakery trucks</p>
+            </div>
+        </div>
+
+        <div class="rto-badge" style="color:var(--case4-color);">
+            <span aria-hidden="true">◔</span> RPO: 1 hour &nbsp;|&nbsp; RTO: 3 hours
+        </div>
+
+        <div class="narrative">
+            <strong>Client Profile</strong>
+            <p>A bakery business with two shop locations in Fayetteville, NC, and two mobile trucks that operate at events and private parties. They need local backups with cloud replication at both locations, and Google Workspace protection for operations and event coordination.</p>
+
+            <p style="margin-top:1rem;font-weight:700;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#475569;">Per Shop Location (×2)</p>
+            <ul class="req-list" style="margin-top:0.5rem;">
+                <li><strong>POS Server:</strong> Daily operations &amp; transactions — backup window 5pm–11pm</li>
+                <li><strong>ERP Server:</strong> Recipe costing &amp; ingredient inventory — backup window 4pm–11pm</li>
+                <li><strong>Inventory Management Server:</strong> Barcoding &amp; food safety tracking — backup window 7pm–9pm</li>
+            </ul>
+
+            <p style="margin-top:1rem;font-weight:700;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#475569;">Mobile Trucks &amp; Cloud</p>
+            <ul class="req-list" style="margin-top:0.5rem;">
+                <li><strong>2 Mobile Bakery Trucks:</strong> macOS devices — must replicate to cloud from any location</li>
+                <li><strong>Google Workspace:</strong> Orders, events, and team coordination — full coverage required</li>
+                <li>Local backup + cloud replication required at both shop locations</li>
+            </ul>
+        </div>
+
+        <div class="discussion-block" style="background:var(--case4-color);">
+            <span class="dq-label" style="color:var(--case4-text);">Discussion Questions</span>
+            <ol class="dq-list">
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">1</span>
+                    <span style="color:rgba(255,255,255,0.9);">How many Datto appliances are required for this environment, and where is each deployed?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">2</span>
+                    <span style="color:rgba(255,255,255,0.9);">How do you configure backup windows for three servers at each location given their different operating hours?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">3</span>
+                    <span style="color:rgba(255,255,255,0.9);">What product and configuration protects the macOS devices on the mobile trucks regardless of event location?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">4</span>
+                    <span style="color:rgba(255,255,255,0.9);">What SaaS coverage do you configure for Google Workspace, and what specific data types are protected?</span>
+                </li>
+                <li>
+                    <span class="dq-num" style="background:rgba(255,255,255,0.2);color:#fff;">5</span>
+                    <span style="color:rgba(255,255,255,0.9);">If Location 1's POS server fails during a peak evening shift, what is the recovery plan to meet the 3-hour RTO?</span>
+                </li>
+            </ol>
+        </div>
+
+    </div>
+</div>
+
+</main>
+
+<script>
+    const requiredCases = ['case1', 'case2', 'case3', 'case4'];
+    const visitedCases = new Set();
+    let completionSent = false;
+
+    function notifyRiseCompletion() {
+        if (completionSent) return;
+        completionSent = true;
+        window.parent.postMessage({ type: 'complete' }, '*');
+    }
+
+    function markCaseVisited(pageId) {
+        if (!requiredCases.includes(pageId)) return;
+        visitedCases.add(pageId);
+
+        if (visitedCases.size === requiredCases.length) {
+            notifyRiseCompletion();
+        }
+    }
+
+    function showPage(pageId, linkEl) {
+        // Hide all pages
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        // Remove active from all nav links
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        // Show target page
+        const target = document.getElementById('page-' + pageId);
+        if (target) target.classList.add('active');
+        // Activate link
+        if (linkEl) linkEl.classList.add('active');
+        // Scroll to top
+        document.querySelector('main').scrollTop = 0;
+        window.scrollTo(0, 0);
+        // Close mobile sidebar
+        document.getElementById('sidebar').classList.remove('open');
+        markCaseVisited(pageId);
+    }
+    window.onload = () => {
+        showPage('overview', document.getElementById('link-overview'));
+    };
+</script>
+</body>
+</html>

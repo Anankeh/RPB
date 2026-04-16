@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DR Cases — Recovery Playbook | Kaseya University</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --ku-blue:   #005696;
+            --ku-dark:   #0a2540;
+            --ku-accent: #00a3e0;
+            --sidebar-w: 280px;
+            --font:      'Inter', system-ui, sans-serif;
+
+            /* DR card accent colors */
+            --dr1: #b91c1c;  /* deep red — ransomware */
+            --dr2: #b45309;  /* amber — file server */
+            --dr3: #0369a1;  /* blue — salesforce */
+            --dr4: #6d28d9;  /* purple — lost laptop */
+            --dr5: #be185d;  /* pink — phishing */
+            --dr6: #0f766e;  /* teal — server failure */
+            --dr7: #4338ca;  /* indigo — hypervisor */
+            --dr8: #1e40af;  /* navy — non-critical */
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap');
+
+        body {
+            font-family: var(--font);
+            background: #f8fafc;
+            color: var(--ku-dark);
+            display: flex;
+            flex-direction: row;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Sidebar ──────────────────────────────────────────── */
+        aside {
+            width: var(--sidebar-w);
+            background: #fff;
+            border-right: 1px solid #e2e8f0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 40;
+            overflow: hidden;
+        }
+        .sidebar-header {
+            padding: 1.75rem 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            background: #f8fafc;
+            text-align: center;
+        }
+        .sidebar-header h1 {
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: var(--ku-dark);
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+        .sidebar-header p {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.25rem;
+        }
+        nav { flex: 1; overflow-y: auto; padding: 1rem 0.5rem; }
+        .nav-section-label {
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #94a3b8;
+            padding: 0.75rem 1.25rem 0.35rem;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 1.25rem;
+            font-size: 0.77rem;
+            font-weight: 600;
+            color: #475569;
+            border-radius: 0.5rem;
+            margin-bottom: 0.1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+        }
+        .nav-link:hover { background: #f8fafc; color: var(--ku-blue); }
+        .nav-link.active {
+            border-left: 3px solid var(--ku-blue);
+            background: #f0f7ff;
+            color: var(--ku-blue);
+            font-weight: 700;
+        }
+        .nav-link-ext {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 1.25rem;
+            font-size: 0.77rem;
+            font-weight: 600;
+            color: #94a3b8;
+            border-radius: 0.5rem;
+            margin-bottom: 0.1rem;
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+        }
+        .nav-link-ext:hover { background: #f8fafc; color: #475569; }
+        .nav-divider { border: none; border-top: 1px solid #f1f5f9; margin: 0.75rem 0.5rem; }
+        .sidebar-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #f1f5f9;
+            background: #f8fafc;
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-align: center;
+        }
+        .nav-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ── Main ─────────────────────────────────────────────── */
+        main {
+            flex: 1;
+            padding: 3rem 3.5rem;
+            max-width: 960px;
+            margin: 0 auto;
+            overflow-y: auto;
+            width: 100%;
+            min-width: 0;
+        }
+        .page-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .page-action-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1rem;
+            border-radius: 999px;
+            border: 1px solid #dbe3eb;
+            background: #fff;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 700;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .page-action-link:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: var(--ku-blue);
+        }
+
+        /* ── Pages ────────────────────────────────────────────── */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ── Page Header ──────────────────────────────────────── */
+        .page-header {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 2rem;
+            margin-bottom: 3rem;
+        }
+        .page-header .label {
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--ku-accent);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .page-header h2 {
+            font-size: 2.25rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            color: #0f172a;
+            text-transform: uppercase;
+        }
+        .page-header p { font-size: 0.85rem; color: #64748b; margin-top: 0.5rem; }
+
+        /* ── DR Index Grid ────────────────────────────────────── */
+        .dr-index {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+        .dr-index-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            transition: box-shadow 0.15s, border-color 0.15s;
+        }
+        .dr-index-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+            border-color: #cbd5e1;
+        }
+        .dr-num {
+            width: 2rem; height: 2rem;
+            border-radius: 0.5rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .dr-index-card h3 {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.3;
+        }
+        .dr-index-card p { font-size: 0.68rem; color: #64748b; margin-top: 0.1rem; }
+
+        /* ── DR Card ──────────────────────────────────────────── */
+        .dr-card {
+            background: #fff;
+            border-radius: 1.25rem;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            margin-bottom: 0;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        /* Card top bar */
+        .dr-card-header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+        .dr-badge {
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.3rem 0.75rem;
+            border-radius: 2rem;
+            color: #fff;
+        }
+        .dr-card-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+        }
+
+        /* Solution stack pill */
+        .solution-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            padding: 0 2rem 1.25rem;
+        }
+        .sol-pill {
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 2rem;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Divider */
+        .card-divider { border: none; border-top: 1px solid #f1f5f9; }
+
+        /* Content grid — 2 column for incident/impact */
+        .dr-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        .dr-col {
+            padding: 1.5rem 2rem;
+            border-right: 1px solid #f1f5f9;
+        }
+        .dr-col:last-child { border-right: none; }
+
+        .dr-col-label {
+            font-size: 0.7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.875rem;
+            display: block;
+        }
+
+        /* Full-width sections */
+        .dr-full {
+            padding: 1.25rem 2rem;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        /* List style */
+        .dr-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .dr-list li {
+            display: block;
+            position: relative;
+            padding-left: 1rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #334155;
+        }
+        .dr-list li::before {
+            content: "›";
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-weight: 900;
+            color: #94a3b8;
+        }
+
+        /* Sub-list */
+        .dr-sublist {
+            list-style: none;
+            padding-left: 0.75rem;
+            margin-left: 0;
+            margin-top: 0.3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .dr-sublist li {
+            display: block;
+            position: relative;
+            padding-left: 0.9rem;
+            font-size: 0.8rem;
+            line-height: 1.45;
+            color: #64748b;
+        }
+        .dr-sublist li::before {
+            content: "–";
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        /* Question block */
+        .dr-question {
+            padding: 1.25rem 2rem;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        .q-icon {
+            width: 2rem; height: 2rem;
+            border-radius: 0.5rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+        .q-label {
+            font-size: 0.7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.35rem;
+            display: block;
+        }
+        .q-text {
+            font-size: 0.82rem;
+            font-weight: 600;
+            line-height: 1.55;
+            color: #1e293b;
+        }
+        .q-subtext {
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-top: 0.35rem;
+            line-height: 1.5;
+        }
+
+        /* Mobile */
+        .mobile-header {
+            display: none;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 1.25rem;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .mobile-header span {
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: var(--ku-dark);
+            text-transform: uppercase;
+        }
+        .menu-btn { background: none; border: none; cursor: pointer; font-size: 1.25rem; color: var(--ku-dark); }
+
+        @media (max-width: 1024px) {
+            main { padding: 2rem 1.75rem; }
+            .page-header h2 { font-size: 1.95rem; }
+            .dr-card-header { padding: 1.25rem 1.5rem; }
+            .solution-stack { padding: 0 1.5rem 1rem; }
+            .dr-col, .dr-full, .dr-question { padding-left: 1.5rem; padding-right: 1.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            aside { position: fixed; left: 0; top: 0; transform: translateX(-100%); transition: transform 0.25s; width: min(86vw, 22rem); height: 100vh; z-index: 60; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2); }
+            aside.open { transform: translateX(0); }
+            .mobile-header { display: flex; }
+            main { padding: 1.5rem 1rem; max-width: none; }
+            .page-actions { justify-content: stretch; }
+            .page-action-link { width: 100%; justify-content: center; }
+            .page-header { padding-bottom: 1.5rem; margin-bottom: 2rem; }
+            .page-header h2 { font-size: 1.7rem; }
+            .dr-index { grid-template-columns: 1fr; }
+            .dr-content { grid-template-columns: 1fr; }
+            .dr-col { border-right: none; border-bottom: 1px solid #f1f5f9; }
+            .dr-card-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+            .solution-stack { padding: 0 1rem 1rem; }
+            .dr-col, .dr-full { padding: 1rem; }
+            .dr-question { padding: 1rem; flex-direction: column; gap: 0.75rem; }
+        }
+
+        @media (max-width: 480px) {
+            .mobile-header { padding: 0.9rem 1rem; }
+            main { padding: 1.25rem 0.9rem; }
+            .dr-index-card { padding: 0.9rem 1rem; align-items: flex-start; }
+            .dr-card { border-radius: 1rem; }
+            .dr-card-title { font-size: 1rem; }
+            .dr-list li, .q-text { font-size: 0.78rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Mobile Header -->
+<div class="mobile-header">
+    <span>DR Cases</span>
+    <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <i class="fas fa-bars"></i>
+    </button>
+</div>
+
+<!-- ── Sidebar ──────────────────────────────────────────────────── -->
+<aside id="sidebar">
+    <div class="sidebar-header">
+        <h1>Kaseya University</h1>
+        <p>Recovery Playbook Lab &bull; LV 2026</p>
+    </div>
+
+    <nav>
+        <span class="nav-section-label">DR Cases Activity</span>
+        <a href="#" class="nav-link active" id="link-overview" onclick="showPage('overview',this)">
+            <i class="fas fa-th-large" style="color:#005696;width:1rem;"></i> Overview
+        </a>
+        <a href="#" class="nav-link" id="link-dr1" onclick="showPage('dr1',this)">
+            <div class="nav-dot" style="background:var(--dr1);"></div> 1 Phishing &amp; Ransomware
+        </a>
+        <a href="#" class="nav-link" id="link-dr2" onclick="showPage('dr2',this)">
+            <div class="nav-dot" style="background:var(--dr2);"></div> 2 Ransomware — File Server
+        </a>
+        <a href="#" class="nav-link" id="link-dr3" onclick="showPage('dr3',this)">
+            <div class="nav-dot" style="background:var(--dr3);"></div> 3 Salesforce Corruption
+        </a>
+        <a href="#" class="nav-link" id="link-dr4" onclick="showPage('dr4',this)">
+            <div class="nav-dot" style="background:var(--dr4);"></div> 4 Lost Laptop
+        </a>
+        <a href="#" class="nav-link" id="link-dr5" onclick="showPage('dr5',this)">
+            <div class="nav-dot" style="background:var(--dr5);"></div> 5 Large Phishing Attack
+        </a>
+        <a href="#" class="nav-link" id="link-dr6" onclick="showPage('dr6',this)">
+            <div class="nav-dot" style="background:var(--dr6);"></div> 6 App Server Failure
+        </a>
+        <a href="#" class="nav-link" id="link-dr7" onclick="showPage('dr7',this)">
+            <div class="nav-dot" style="background:var(--dr7);"></div> 7 Hypervisor + SaaS
+        </a>
+        <a href="#" class="nav-link" id="link-dr8" onclick="showPage('dr8',this)">
+            <div class="nav-dot" style="background:var(--dr8);"></div> 8 Non-Critical Restores
+        </a>
+    </nav>
+
+</aside>
+
+<!-- ── Main Content ──────────────────────────────────────────────── -->
+<main>
+    <div class="page-actions">
+        <a href="1_Main_content.html" class="page-action-link">Home</a>
+    </div>
+
+<!-- ============================================================ -->
+<!-- OVERVIEW -->
+<!-- ============================================================ -->
+<div id="page-overview" class="page active">
+    <div class="page-header">
+        <span class="label">DR Scenario Activity</span>
+        <h2>Disaster Recovery Cases</h2>
+        <p>Eight rapid-read scenarios. Identify the right restore strategy for each situation. Answers are not shown — discuss with your group and justify your decisions.</p>
+    </div>
+
+    <div class="dr-index">
+        <div class="dr-index-card" onclick="showPage('dr1', document.getElementById('link-dr1'))">
+            <div class="dr-num" style="background:var(--dr1);">1</div>
+            <div><h3>Phishing &amp; Ransomware Attack</h3><p>BCDR · SaaS Protection</p></div>
+        </div>
+        <div class="dr-index-card" onclick="showPage('dr2', document.getElementById('link-dr2'))">
+            <div class="dr-num" style="background:var(--dr2);">2</div>
+            <div><h3>Ransomware on File Server</h3><p>BCDR · Unitrends</p></div>
+        </div>
+        <div class="dr-index-card" onclick="showPage('dr3', document.getElementById('link-dr3'))">
+            <div class="dr-num" style="background:var(--dr3);">3</div>
+            <div><h3>Salesforce Data Corruption</h3><p>SaaS Protection / Spanning</p></div>
+        </div>
+        <div class="dr-index-card" onclick="showPage('dr4', document.getElementById('link-dr4'))">
+            <div class="dr-num" style="background:var(--dr4);">4</div>
+            <div><h3>Lost Laptop — Un-synced Files</h3><p>Endpoint Backup</p></div>
+        </div>
+        <div class="dr-index-card" onclick="showPage('dr5', document.getElementById('link-dr5'))">
+            <div class="dr-num" style="background:var(--dr5);">5</div>
+            <div><h3>Large Phishing Attack</h3><p>BCDR · SaaS Protection · Endpoint</p></div>
+        </div>
+        <div class="dr-index-card" onclick="showPage('dr6', document.getElementById('link-dr6'))">
+            <div class="dr-num" style="background:var(--dr6);">6</div>
+            <div><h3>Critical Application Server Failure</h3><p>Unitrends</p></div>
+        </div>
+        <div class="dr-index-card" onclick="showPage('dr7', document.getElementById('link-dr7'))">
+            <div class="dr-num" style="background:var(--dr7);">7</div>
+            <div><h3>Hypervisor Failure + SaaS Deletion</h3><p>Unitrends · SaaS Protection</p></div>
+        </div>
+        <div class="dr-index-card" onclick="showPage('dr8', document.getElementById('link-dr8'))">
+            <div class="dr-num" style="background:var(--dr8);">8</div>
+            <div><h3>Non-Critical Restores for BCDR</h3><p>Datto BCDR</p></div>
+        </div>
+    </div>
+
+    <div style="background:#0f172a;border-radius:1rem;padding:1.5rem 2rem;color:#94a3b8;font-size:0.78rem;line-height:1.6;">
+        <i class="fas fa-info-circle" style="color:#00a3e0;margin-right:0.5rem;"></i>
+        Each scenario presents the <strong style="color:#fff;">Initial Incident</strong>, <strong style="color:#fff;">Immediate Impact</strong>, and a <strong style="color:#fff;">Compounding Factor</strong> where applicable — followed by a targeted question. No answers are displayed. Points are awarded for each correct restore type identified.
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DR 1 — PHISHING & RANSOMWARE ATTACK -->
+<!-- ============================================================ -->
+<div id="page-dr1" class="page">
+    <div class="dr-card">
+        <div class="dr-card-header">
+            <div class="dr-badge" style="background:var(--dr1);">DR 1</div>
+            <div class="dr-card-title">Phishing &amp; Ransomware Attack</div>
+        </div>
+        <div class="solution-stack">
+            <span class="sol-pill"><i class="fas fa-server" style="margin-right:0.3rem;"></i>Datto BCDR</span>
+            <span class="sol-pill"><i class="fas fa-cloud" style="margin-right:0.3rem;"></i>SaaS Protection / Spanning</span>
+        </div>
+        <hr class="card-divider">
+        <div class="dr-content">
+            <!-- Initial Incident -->
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr1);">Initial Incident — Phishing + Ransomware</span>
+                <ul class="dr-list">
+                    <li>An employee clicks a malicious email attachment</li>
+                    <li>Malware spreads across the network</li>
+                    <li>On-prem virtual machines and physical file servers become encrypted</li>
+                </ul>
+            </div>
+            <!-- Immediate Impact -->
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr1);">Immediate Impact</span>
+                <ul class="dr-list">
+                    <li>Internal applications go offline</li>
+                    <li>Shared file systems are inaccessible</li>
+                    <li>Customer-facing dashboards stop working</li>
+                    <li>Employees cannot access critical data</li>
+                    <li>OS volumes on all machines are affected</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Compounding Issue -->
+        <div class="dr-full">
+            <span class="dr-col-label" style="color:var(--dr1);">Compounding Issue — Human Error in SaaS Apps</span>
+            <p style="font-size:0.75rem;color:64748b;margin-bottom:0.65rem;font-style:italic;">During response efforts:</p>
+            <ul class="dr-list">
+                <li>IT accidentally deletes multiple Microsoft 365 user accounts</li>
+                <li>SharePoint folders are removed</li>
+            </ul>
+        </div>
+        <!-- Question -->
+        <div class="dr-question">
+            <div class="q-icon" style="background:#fef2f2;color:var(--dr1);">
+                <i class="fas fa-question"></i>
+            </div>
+            <div>
+                <span class="q-label" style="color:var(--dr1);">Question</span>
+                <p class="q-text">The company currently uses BCDR and SaaS Protection/Spanning products. What restore options would you employ in this disaster recovery scenario?</p>
+                <p class="q-subtext">Let us know what types of restores you would use for each situation. You will be awarded points for each correct answer you offer.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DR 2 — RANSOMWARE ON FILE SERVER -->
+<!-- ============================================================ -->
+<div id="page-dr2" class="page">
+    <div class="dr-card">
+        <div class="dr-card-header">
+            <div class="dr-badge" style="background:var(--dr2);">DR 2</div>
+            <div class="dr-card-title">Ransomware on File Server</div>
+        </div>
+        <div class="solution-stack">
+            <span class="sol-pill"><i class="fas fa-server" style="margin-right:0.3rem;"></i>Datto BCDR</span>
+            <span class="sol-pill"><i class="fas fa-shield-alt" style="margin-right:0.3rem;"></i>Unitrends</span>
+        </div>
+        <hr class="card-divider">
+        <div class="dr-content">
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr2);">Initial Incident</span>
+                <ul class="dr-list">
+                    <li>An employee downloads a malicious attachment from a phishing email</li>
+                    <li>Payload executes silently and begins encrypting files on a shared network drive</li>
+                    <li>Because the file server is widely accessed, ransomware spreads across all mapped drives but does <strong>NOT</strong> affect the OS volume</li>
+                    <li>Within minutes, the file server and connected storage volumes are fully encrypted</li>
+                </ul>
+            </div>
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr2);">Immediate Impact</span>
+                <ul class="dr-list">
+                    <li>All shared folders become inaccessible or display encrypted file extensions</li>
+                    <li>Employees across departments lose access to critical documents (finance, HR, operations)</li>
+                    <li>Line-of-business applications relying on file shares begin to fail</li>
+                    <li>A ransom note appears demanding payment for decryption keys</li>
+                    <li>Productivity halts as users cannot open or save files</li>
+                </ul>
+            </div>
+        </div>
+        <div class="dr-question">
+            <div class="q-icon" style="background:#fffbeb;color:var(--dr2);">
+                <i class="fas fa-question"></i>
+            </div>
+            <div>
+                <span class="q-label" style="color:var(--dr2);">Question</span>
+                <p class="q-text">Although it is highly unlikely they would have both BCDR and Unitrends deployed for this environment — what would our restore solutions be for each product?</p>
+                <p class="q-subtext">Address both Datto BCDR and Unitrends separately in your answer.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DR 3 — SALESFORCE DATA CORRUPTION -->
+<!-- ============================================================ -->
+<div id="page-dr3" class="page">
+    <div class="dr-card">
+        <div class="dr-card-header">
+            <div class="dr-badge" style="background:var(--dr3);">DR 3</div>
+            <div class="dr-card-title">Salesforce Data Corruption</div>
+        </div>
+        <div class="solution-stack">
+            <span class="sol-pill"><i class="fas fa-cloud" style="margin-right:0.3rem;"></i>SaaS Protection / Spanning</span>
+        </div>
+        <hr class="card-divider">
+        <div class="dr-content">
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr3);">Initial Incident</span>
+                <ul class="dr-list">
+                    <li>The company integrates Salesforce with a new third-party marketing automation tool</li>
+                    <li>During initial setup, a misconfigured sync rule is deployed</li>
+                    <li>The integration begins bulk updating records incorrectly:
+                        <ul class="dr-sublist">
+                            <li>Overwriting account details</li>
+                            <li>Setting contact fields to blank or incorrect values</li>
+                            <li>Updating opportunity stages improperly</li>
+                        </ul>
+                    </li>
+                    <li>Thousands of records are modified within minutes before the issue is detected</li>
+                </ul>
+            </div>
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr3);">Immediate Impact</span>
+                <ul class="dr-list">
+                    <li>Sales pipeline becomes unreliable due to incorrect opportunity data</li>
+                    <li>Account and contact records lose critical information</li>
+                    <li>Reporting and forecasting dashboards become inaccurate</li>
+                    <li>Sales and customer success teams cannot trust CRM data</li>
+                    <li>Business operations slow down due to uncertainty and manual verification</li>
+                </ul>
+            </div>
+        </div>
+        <div class="dr-question">
+            <div class="q-icon" style="background:#eff6ff;color:var(--dr3);">
+                <i class="fas fa-question"></i>
+            </div>
+            <div>
+                <span class="q-label" style="color:var(--dr3);">Question</span>
+                <p class="q-text">Which solution should they have had employed to protect against this scenario, and what kind of restoration would they be looking to perform?</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DR 4 — LOST LAPTOP WITH UN-SYNCED FILES -->
+<!-- ============================================================ -->
+<div id="page-dr4" class="page">
+    <div class="dr-card">
+        <div class="dr-card-header">
+            <div class="dr-badge" style="background:var(--dr4);">DR 4</div>
+            <div class="dr-card-title">Lost Laptop with Un-synced Files</div>
+        </div>
+        <div class="solution-stack">
+            <span class="sol-pill"><i class="fas fa-laptop" style="margin-right:0.3rem;"></i>Endpoint Backup</span>
+        </div>
+        <hr class="card-divider">
+        <div class="dr-content">
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr4);">Initial Incident</span>
+                <ul class="dr-list">
+                    <li>A sales executive is traveling and working offline (on a plane and later in a hotel)</li>
+                    <li>They create and modify several important files:
+                        <ul class="dr-sublist">
+                            <li>Client proposals</li>
+                            <li>Pricing spreadsheets</li>
+                            <li>Contract drafts</li>
+                        </ul>
+                    </li>
+                    <li>Files are saved locally on Desktop and Documents — not yet synced to Microsoft 365 or cloud storage</li>
+                    <li>Later that day, the laptop is lost or stolen (left in a taxi or airport)</li>
+                </ul>
+            </div>
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr4);">Immediate Impact</span>
+                <ul class="dr-list">
+                    <li>Device is no longer accessible</li>
+                    <li>Critical business files exist only on the lost laptop</li>
+                    <li>Work completed during travel appears to be permanently lost</li>
+                    <li>Potential delays in sales cycles and client deliverables</li>
+                    <li>Security concern due to sensitive data on a missing device</li>
+                </ul>
+            </div>
+        </div>
+        <div class="dr-question">
+            <div class="q-icon" style="background:#f5f3ff;color:var(--dr4);">
+                <i class="fas fa-question"></i>
+            </div>
+            <div>
+                <span class="q-label" style="color:var(--dr4);">Question</span>
+                <p class="q-text">Which solution(s) would help protect against this scenario? What kind of restore would you perform to get the user's device and data back up and running?</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DR 5 — LARGE PHISHING ATTACK -->
+<!-- ============================================================ -->
+<div id="page-dr5" class="page">
+    <div class="dr-card">
+        <div class="dr-card-header">
+            <div class="dr-badge" style="background:var(--dr5);">DR 5</div>
+            <div class="dr-card-title">Large Phishing Attack</div>
+        </div>
+        <div class="solution-stack">
+            <span class="sol-pill"><i class="fas fa-server" style="margin-right:0.3rem;"></i>Datto BCDR</span>
+            <span class="sol-pill"><i class="fas fa-cloud" style="margin-right:0.3rem;"></i>SaaS Protection</span>
+            <span class="sol-pill"><i class="fas fa-laptop" style="margin-right:0.3rem;"></i>Endpoint Backup</span>
+        </div>
+        <hr class="card-divider">
+        <div class="dr-content">
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr5);">Initial Incident</span>
+                <ul class="dr-list">
+                    <li>A user receives a convincing phishing email and enters credentials into a fake login page</li>
+                    <li>The attacker gains access to:
+                        <ul class="dr-sublist">
+                            <li>Network credentials (servers and file shares)</li>
+                            <li>Microsoft 365 account (email, OneDrive, SharePoint)</li>
+                        </ul>
+                    </li>
+                    <li>The attacker then:
+                        <ul class="dr-sublist">
+                            <li>Launches ransomware across file servers and virtual machines</li>
+                            <li>Deletes and modifies files in SharePoint and OneDrive</li>
+                            <li>Corrupts locally stored files on both in-office and remote endpoints</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr5);">Immediate Impact</span>
+                <ul class="dr-list">
+                    <li><strong>Servers:</strong> File servers and applications are encrypted; business-critical systems go offline</li>
+                    <li><strong>Microsoft 365:</strong> Files deleted/overwritten in SharePoint/OneDrive; email account compromised</li>
+                    <li><strong>User Devices:</strong> Local files encrypted or corrupted for both in-office and work-from-home users; non-synced work is lost</li>
+                    <li><strong>Business:</strong> Organization-wide downtime; high risk of permanent data loss across all environments</li>
+                </ul>
+            </div>
+        </div>
+        <div class="dr-question">
+            <div class="q-icon" style="background:#fdf2f8;color:var(--dr5);">
+                <i class="fas fa-question"></i>
+            </div>
+            <div>
+                <span class="q-label" style="color:var(--dr5);">Question</span>
+                <p class="q-text">The partner already has Datto BCDR deployed for office users and Endpoint Backup for remote workers. What other backup solutions could they have employed? What restore types would you deploy for BCDR and each additional product to fully restore the environment?</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DR 6 — CRITICAL APPLICATION SERVER FAILURE -->
+<!-- ============================================================ -->
+<div id="page-dr6" class="page">
+    <div class="dr-card">
+        <div class="dr-card-header">
+            <div class="dr-badge" style="background:var(--dr6);">DR 6</div>
+            <div class="dr-card-title">Critical Application Server Failure</div>
+        </div>
+        <div class="solution-stack">
+            <span class="sol-pill"><i class="fas fa-shield-alt" style="margin-right:0.3rem;"></i>Unitrends</span>
+        </div>
+        <hr class="card-divider">
+        <div class="dr-content">
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr6);">Initial Incident</span>
+                <ul class="dr-list">
+                    <li>During a routine patch deployment, a critical VMware application server crashes unexpectedly</li>
+                    <li>The server hosts the firm's client reporting and transaction processing applications</li>
+                    <li>Attempts to reboot the server fail — OS and application data are corrupted</li>
+                    <li>IT discovers the virtual disk is damaged and may require a full rebuild</li>
+                </ul>
+            </div>
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr6);">Immediate Impact</span>
+                <ul class="dr-list">
+                    <li>Employees cannot access client reporting applications</li>
+                    <li>Daily financial transactions cannot be processed</li>
+                    <li>Customer-facing dashboards go offline</li>
+                    <li>Revenue-sensitive operations are at risk if downtime extends</li>
+                    <li>Manual workarounds are not feasible due to data dependencies</li>
+                </ul>
+            </div>
+        </div>
+        <div class="dr-question">
+            <div class="q-icon" style="background:#f0fdfa;color:var(--dr6);">
+                <i class="fas fa-question"></i>
+            </div>
+            <div>
+                <span class="q-label" style="color:var(--dr6);">Question</span>
+                <p class="q-text">The company uses Unitrends as its backup solution. What steps would you take to resolve this DR situation? What could they have done in advance to increase their RTO performance?</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DR 7 — HYPERVISOR FAILURE + ACCIDENTAL SAAS DELETION -->
+<!-- ============================================================ -->
+<div id="page-dr7" class="page">
+    <div class="dr-card">
+        <div class="dr-card-header">
+            <div class="dr-badge" style="background:var(--dr7);">DR 7</div>
+            <div class="dr-card-title">Hypervisor Failure &amp; Accidental SaaS Deletion</div>
+        </div>
+        <div class="solution-stack">
+            <span class="sol-pill"><i class="fas fa-shield-alt" style="margin-right:0.3rem;"></i>Kaseya Unitrends</span>
+            <span class="sol-pill"><i class="fas fa-cloud" style="margin-right:0.3rem;"></i>SaaS Protection / Spanning (M365)</span>
+        </div>
+        <hr class="card-divider">
+        <div class="dr-content">
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr7);">Initial Incident</span>
+                <ul class="dr-list">
+                    <li><strong>1. Hypervisor Failure (On-Prem):</strong> During routine maintenance, a VMware ESXi host crashes due to a corrupted firmware update. The host contains:
+                        <ul class="dr-sublist">
+                            <li>Case management applications</li>
+                            <li>Client document servers</li>
+                            <li>Internal collaboration platforms</li>
+                        </ul>
+                    </li>
+                    <li><strong>2. Accidental SaaS Deletion (M365):</strong> Simultaneously, an admin cleaning up old SharePoint sites accidentally deletes an active project folder and multiple OneDrive accounts</li>
+                </ul>
+            </div>
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr7);">Immediate Impact</span>
+                <ul class="dr-list">
+                    <li><strong>On-Prem:</strong> Applications and file servers go offline; employees cannot access client documents; case tracking is disrupted</li>
+                    <li><strong>Microsoft 365:</strong> Users lose access to SharePoint project files and OneDrive content; collaboration halted; native retention policies cannot fully recover deleted items</li>
+                </ul>
+            </div>
+        </div>
+        <div class="dr-question">
+            <div class="q-icon" style="background:#eef2ff;color:var(--dr7);">
+                <i class="fas fa-question"></i>
+            </div>
+            <div>
+                <span class="q-label" style="color:var(--dr7);">Question</span>
+                <p class="q-text">What would a disaster recovery plan look like for this scenario? Address both the Unitrends restore strategy for the on-prem environment and the SaaS Protection restore strategy for Microsoft 365.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DR 8 — NON-CRITICAL RESTORES FOR BCDR -->
+<!-- ============================================================ -->
+<div id="page-dr8" class="page">
+    <div class="dr-card">
+        <div class="dr-card-header">
+            <div class="dr-badge" style="background:var(--dr8);">DR 8</div>
+            <div class="dr-card-title">Non-Critical Restores for BCDR</div>
+        </div>
+        <div class="solution-stack">
+            <span class="sol-pill"><i class="fas fa-server" style="margin-right:0.3rem;"></i>Datto BCDR</span>
+        </div>
+        <hr class="card-divider">
+        <div class="dr-content">
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr8);">Initial Incident</span>
+                <ul class="dr-list">
+                    <li>An IT administrator runs a cleanup script on the company's shared file server</li>
+                    <li>A misconfigured command deletes entire project directories across multiple mapped drives</li>
+                    <li>These directories contain:
+                        <ul class="dr-sublist">
+                            <li>Client deliverables</li>
+                            <li>Financial documents</li>
+                            <li>Internal strategy files</li>
+                        </ul>
+                    </li>
+                    <li>The deleted data spans an entire server volume — not just individual folders</li>
+                </ul>
+            </div>
+            <div class="dr-col">
+                <span class="dr-col-label" style="color:var(--dr8);">Immediate Impact</span>
+                <ul class="dr-list">
+                    <li>Employees lose access to critical files across multiple departments</li>
+                    <li>Sensitive folders with granular NTFS permissions (restricted by team, role, and client) are gone</li>
+                    <li>Even if files were recovered manually, rebuilding permissions would be extremely time-consuming and error-prone</li>
+                    <li>Risk of unauthorized access if permissions are restored incorrectly</li>
+                    <li>Compliance issues for client data</li>
+                    <li>Business operations slow significantly due to missing data and access control concerns</li>
+                </ul>
+            </div>
+        </div>
+        <div class="dr-question">
+            <div class="q-icon" style="background:#eff6ff;color:var(--dr8);">
+                <i class="fas fa-question"></i>
+            </div>
+            <div>
+                <span class="q-label" style="color:var(--dr8);">Question</span>
+                <p class="q-text">What type of Datto BCDR restore would best be used in this situation — and why is that restore type specifically suited to preserve what was lost?</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<script>
+    function showPage(pageId, linkEl) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        const target = document.getElementById('page-' + pageId);
+        if (target) target.classList.add('active');
+        if (linkEl) linkEl.classList.add('active');
+        document.querySelector('main').scrollTop = 0;
+        window.scrollTo(0, 0);
+        document.getElementById('sidebar').classList.remove('open');
+    }
+    window.onload = () => showPage('overview', document.getElementById('link-overview'));
+</script>
+</body>
+</html>
